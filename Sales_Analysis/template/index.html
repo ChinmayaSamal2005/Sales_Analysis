@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Business Sales Analyzer</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+            color: #eaeaea;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.2);
+            backdrop-filter: blur(8px);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #00eaff;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-shadow: 0 0 8px #00eaff44;
+        }
+
+        form, .download-button {
+            text-align: center;
+            margin: 25px 0;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            background: #222;
+            border: 2px solid #00eaff;
+            border-radius: 10px;
+            color: #eaeaea;
+            transition: 0.3s;
+        }
+
+        input[type="file"]:hover {
+            border-color: #00ffc6;
+            background-color: #333;
+        }
+
+        button, .download-button a {
+            background: linear-gradient(to right, #00eaff, #0072ff);
+            border: none;
+            padding: 12px 28px;
+            color: white;
+            font-weight: bold;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.4);
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        button:hover, .download-button a:hover {
+            transform: scale(1.08);
+            background: linear-gradient(to right, #00ffc6, #0072ff);
+        }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+            background-color: #1f1f1f;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+        }
+
+        th, td {
+            padding: 14px;
+            border: 1px solid #444;
+            text-align: center;
+        }
+
+        th {
+            background-color: #00eaff33;
+        }
+
+        tr:hover {
+            background-color: #00eaff11;
+            transition: 0.3s;
+        }
+
+        .highlight {
+            background: linear-gradient(to right, #0f2027, #203a43);
+            padding: 12px 20px;
+            margin: 15px 0;
+            border-left: 4px solid #00ffc6;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 229, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Business Sales Analyzer</h1>
+
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" required>
+            <button type="submit">Analyze</button>
+        </form>
+
+        {% if table %}
+        <div class="download-button">
+            <a href="/download-summary">⬇️ Download Summary Excel</a>
+        </div>
+
+        <h2>📋 Sales Summary</h2>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Total Quantity Sold</th>
+                <th>Total Revenue</th>
+            </tr>
+            {% for row in table %}
+            <tr>
+                <td>{{ row['Product Name'] }}</td>
+                <td>{{ row['Quantity Sold'] }}</td>
+                <td>₹{{ "%.2f"|format(row['Revenue']) }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if top_products %}
+        <h2>🏆 Top 3 Products</h2>
+        {% for product in top_products %}
+        <div class="highlight">
+            <strong>{{ product['Product Name'] }}</strong> – ₹{{ "%.2f"|format(product['Revenue']) }} from {{ product['Quantity Sold'] }} units
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if predictions %}
+        <h2>🔮 Forecast (Next Month)</h2>
+        <table>
+            <tr>
+                <th>Product</th>
+                <th>Predicted Quantity</th>
+            </tr>
+            {% for p in predictions %}
+            <tr>
+                <td>{{ p['Product'] }}</td>
+                <td>{{ p['Predicted Quantity Next Month'] }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        {% if trend_chart %}
+        <h2>📈 Monthly Sales Trend</h2>
+        <div>{{ trend_chart | safe }}</div>
+        {% endif %}
+
+        {% if bar_chart %}
+        <h2>💰 Revenue Chart</h2>
+        <div>{{ bar_chart | safe }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
